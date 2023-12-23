@@ -5,6 +5,7 @@ import {
   UseGuards,
   Req,
   HttpException,
+  Get,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { JwtAuthGuard } from '../auth/guards/auth.guard';
@@ -29,5 +30,17 @@ export class FileController {
     }
 
     return await this.fileService.create(projectId, createProjectDto);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getFileByUser(@Req() request: any) {
+    const { userId, projectId } = request.user;
+
+    if (!userId || !projectId) {
+      throw new HttpException('Verifique sus credenciales', 404);
+    }
+
+    return this.fileService.findAllByUser(projectId, userId);
   }
 }

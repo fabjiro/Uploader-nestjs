@@ -62,6 +62,17 @@ export class ProjectService {
     }
   }
 
+  async findOneBy(project: Partial<Project>) {
+    try {
+      return await this.projectRepository.findOneBy(project);
+    } catch (error) {
+      throw new HttpException(
+        'Hemos tenido problemas procesando su peticion',
+        500,
+      );
+    }
+  }
+
   async findOneByUserId(projectId: string, userId: string) {
     try {
       return await this.projectRepository.findOneBy({

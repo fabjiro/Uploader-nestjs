@@ -64,6 +64,26 @@ export class FileService {
     }
   }
 
+  async findAllByUser(projectId: string, userId: string) {
+    try {
+      const project = await this.projectService.findOneBy({
+        id: projectId,
+        userId,
+      });
+      if (!project) {
+        throw new HttpException('Proyecto no disponible', 404);
+      }
+
+      return await this.fileRepository.find({
+        where: {
+          projectId: project.id,
+        },
+      });
+    } catch (error) {
+      throw new HttpException('Hay problemas al procesar su peticion', 500);
+    }
+  }
+
   remove(id: number) {
     return `This action removes a #${id} file`;
   }
