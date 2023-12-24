@@ -84,7 +84,38 @@ export class FileService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} file`;
+  async removeByUserAndProject(
+    projectId: string,
+    userId: string,
+    fileId: string,
+  ) {
+    try {
+      const project = await this.projectService.findOneBy({
+        id: projectId,
+        userId,
+      });
+
+      if (!project) {
+        throw new HttpException('Proyecto no disponible', 404);
+      }
+
+      const file = await this.fileRepository.findOneBy({
+        id: fileId,
+        projectId: project.id,
+      });
+
+      if (!file) {
+        throw new HttpException('Archivo no disponible', 404);
+      }
+
+      await Promise.all([
+        this.fileRepository.remove(file),
+        this.uploaderService.Remove(file.pathRemote),
+      ]);
+
+      return true;
+    } catch (error) {
+      throw new HttpException('Hay problemas al procesar su peticion', 500);
+    }
   }
 }

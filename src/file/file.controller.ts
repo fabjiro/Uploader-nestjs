@@ -6,6 +6,8 @@ import {
   Req,
   HttpException,
   Get,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { JwtAuthGuard } from '../auth/guards/auth.guard';
@@ -42,5 +44,12 @@ export class FileController {
     }
 
     return this.fileService.findAllByUser(projectId, userId);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  async deleteFileByUserAndProkect(@Req() req: any, @Param('id') id: string) {
+    const { userId, projectId } = req.user;
+    return await this.fileService.removeByUserAndProject(projectId, userId, id);
   }
 }
