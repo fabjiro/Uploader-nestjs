@@ -22,9 +22,14 @@ export class AuthService {
     return {
       name: userRegister.name,
       email: userRegister.email,
-      token: this.jwtService.sign({
-        userId: userRegister.id,
-      }),
+      token: this.jwtService.sign(
+        {
+          userId: userRegister.id,
+        },
+        {
+          expiresIn: '1d',
+        },
+      ),
     };
   }
 
@@ -35,7 +40,6 @@ export class AuthService {
     if (userRegister == null) {
       throw new HttpException('User not found', 404);
     }
-
     const isValidPassword = await this.encriptService.comparePasswords(
       password,
       userRegister.password,
@@ -48,9 +52,14 @@ export class AuthService {
     return {
       name: userRegister.name,
       email: userRegister.email,
-      token: this.jwtService.sign({
-        userId: userRegister.id,
-      }),
+      token: this.jwtService.sign(
+        {
+          userId: userRegister.id,
+        },
+        {
+          expiresIn: '1d',
+        },
+      ),
     };
   }
 
@@ -67,10 +76,15 @@ export class AuthService {
     return {
       name: user.name,
       email: user.email,
-      token: this.jwtService.sign({
-        userId: user.id,
-        projectId: project.id,
-      }),
+      token: this.jwtService.sign(
+        {
+          userId: user.id,
+          projectId: project.id,
+        },
+        {
+          expiresIn: '1y',
+        },
+      ),
     };
   }
 }
