@@ -11,6 +11,7 @@ import { UserModule } from './user/user.module';
 import { AuthController } from './auth/auth.controller';
 import { UploaderModule } from './uploader/uploader.module';
 import { DropboxService } from './dropbox/dropbox.service';
+import { WaterfreeModule } from './waterfree/waterfree.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DropboxService } from './dropbox/dropbox.service';
     ProjectModule,
     AuthModule,
     UploaderModule,
+    WaterfreeModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, EncryptionService, DropboxService],
