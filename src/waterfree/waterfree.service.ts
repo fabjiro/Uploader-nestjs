@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WaterFreeDto } from './dto/waterfree.dto';
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 
 @Injectable()
 export class WaterfreeService {
@@ -25,8 +25,8 @@ export class WaterfreeService {
       const apellido = nombreSplit[1];
 
       // Define the data to send in the axios request
-      try {
-        await this.axiosInstance.post('forms', {
+      this.axiosInstance
+        .post('forms', {
           campaignName: 'Spark Watermelon',
           form: JSON.stringify([
             {
@@ -74,37 +74,57 @@ export class WaterfreeService {
           email: email,
           receiveMail: true,
           cedula: cedulaSanity,
-        });
-      } catch (error) {
-        console.error(error);
-      }
+        })
+        .then(() => null);
 
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
       console.log('formulario creado correctamente');
 
-      const response = await this.axiosInstance.post('users/reward-codes', {
-        campaignName: 'Spark Watermelon',
-        deviceType: 3,
-        cedula: cedulaSanity,
-        email: email,
-      });
+      try {
+        const response = await this.axiosInstance.post('users/reward-codes', {
+          campaignName: 'Spark Watermelon',
+          deviceType: 3,
+          cedula: cedulaSanity,
+          email: email,
+        });
 
-      console.log('codigo obtenido correctamente');
+        console.log('codigo obtenido correctamente');
 
-      if (response.status === 200) {
-        const result = response.data;
-        if ('code' in result) {
-          return {
-            code: result.code ?? '',
-            message: '',
-          };
+        if (response.status === 200) {
+          const result = response.data;
+          if ('code' in result) {
+            return {
+              code: result.code ?? '',
+              message: '',
+            };
+          }
         }
+        return {
+          code: '',
+          message: '',
+        };
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError;
+          if (axiosError.response) {
+            // Request made and server responded
+            const response = axiosError.response as any;
+
+            return {
+              code: '',
+              ...response.data,
+            };
+          }
+        }
+        return {
+          code: '',
+          message: '',
+        };
       }
-      return {
-        code: '',
-        message: '',
-      };
     } catch (error) {
-      console.error(error);
+      console.log('error');
       return {
         code: '',
         message: '',
