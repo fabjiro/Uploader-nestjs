@@ -23,7 +23,7 @@ import { WaterfreeModule } from './waterfree/waterfree.module';
       type: 'postgres',
       url: process.env.POSTGRES_URL + '?sslmode=require', // or process.env.POSTGRES_URL_NON_POOLING for non-pooling connection
       entities: ['./dist/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false,
       logging: true,
     }),
     UserModule,
