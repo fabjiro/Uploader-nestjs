@@ -5,6 +5,6 @@ import { UploaderLocalService } from './uploader.local.service';
 
 @Module({
   providers: [UploaderService, DropboxService, UploaderLocalService],
-  exports: [UploaderService],
+  exports: [UploaderService, UploaderLocalService],
 })
 export class UploaderModule {}

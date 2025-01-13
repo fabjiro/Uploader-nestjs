@@ -8,6 +8,10 @@ import { UploaderService } from '../uploader/uploader.service';
 import { Base64Utils } from '../utils/base64.utils';
 import { ConstVar } from '../const';
 import { v4 as uuidv4 } from 'uuid';
+import { UploaderLocalService } from '../uploader/uploader.local.service';
+import { IUploader } from '../uploader/interfaces/IUploader';
+import { ConfigService } from '@nestjs/config';
+import { ModeEnum } from '../enum/mode.enum';
 @Injectable()
 export class FileService {
   constructor(
@@ -15,10 +19,13 @@ export class FileService {
     private readonly fileRepository: Repository<File>,
     private readonly projectService: ProjectService,
     private readonly uploaderService: UploaderService,
+    private readonly uploaderLocalService: UploaderLocalService,
+    private configService: ConfigService,
   ) {}
 
   async create(projectId: string, fileData: FileCreateDto) {
     try {
+      const mode = this.configService.get<string>('MODE');
       const { file } = fileData;
       const fileName = uuidv4();
       const project = await this.projectService.findOne(projectId);
@@ -30,11 +37,22 @@ export class FileService {
       const fileLocal = Base64Utils.base64ToFile(file);
       const fileExtension = Base64Utils.base64FileExtension(file);
 
-      const fileUploader = await this.uploaderService.Uploader(
-        fileLocal,
-        `${ConstVar.pathUploader}/${project.userId}/${project.id}`,
-        `${fileName}.${fileExtension}`,
-      );
+      let fileUploader: IUploader;
+
+      console.log('mode', mode);
+      if (mode === ModeEnum.REMOTE) {
+        fileUploader = await this.uploaderService.Uploader(
+          fileLocal,
+          `${ConstVar.pathUploader}/${project.userId}/${project.id}`,
+          `${fileName}.${fileExtension}`,
+        );
+      } else if (mode === ModeEnum.LOCAL) {
+        fileUploader = await this.uploaderLocalService.Uploader(
+          fileLocal,
+          `${ConstVar.pathUploader}/${project.userId}/${project.id}`,
+          `${fileName}.${fileExtension}`,
+        );
+      }
 
       return await this.fileRepository.save({
         id: fileName,

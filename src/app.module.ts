@@ -29,8 +29,8 @@ import { join } from 'path';
       logging: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'), // Ruta de la carpeta a exponer
-      serveRoot: '/files', // Prefijo opcional para la URL
+      rootPath: join(__dirname, 'public'), // Ruta de la carpeta a exponer
+      serveRoot: '/public', // Prefijo opcional para la URL
     }),
     UserModule,
     FileModule,

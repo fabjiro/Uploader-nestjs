@@ -16,11 +16,14 @@ export class UploaderLocalService implements IUploaderService {
     const port = this.configService.get<string>('PORT');
     const destinationFolder = join(__dirname, '..', 'public'); // Carpeta de destino
 
-    await fs.rename(pathLocal, join(destinationFolder, fileName));
+    await fs.mkdir(destinationFolder, { recursive: true });
+
+    await fs.copyFile(pathLocal, join(destinationFolder, fileName));
+    await fs.unlink(pathLocal);
 
     return {
-      link: `http://localhost:${port}/${fileName}`,
-      pathRemote: `http://localhost:${port}/${fileName}`,
+      link: `http://localhost:${port}/public/${fileName}`,
+      pathRemote: join(destinationFolder, fileName),
     };
   }
   async Remove(pathRemote: string): Promise<boolean> {
