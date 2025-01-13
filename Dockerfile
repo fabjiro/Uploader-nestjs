@@ -5,12 +5,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copia los archivos necesarios para instalar las dependencias
-COPY package.json pnpm-lock.yaml ./
-# Copia el archivo .env
-COPY .env .env
+COPY package.json ./
 
 # Instala pnpm globalmente y luego las dependencias del proyecto
-RUN npm install -g pnpm && pnpm install
+RUN npm install -g pnpm && pnpm install --prod
 
 # Copia el resto del código fuente
 COPY . .
@@ -28,7 +26,6 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=builder /app/.env ./.env
 
 # Instala únicamente las dependencias de producción
 RUN npm install -g pnpm && pnpm install --prod
