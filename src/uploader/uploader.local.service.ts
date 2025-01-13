@@ -4,6 +4,8 @@ import { IUploader } from './interfaces/IUploader';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { ConfigService } from '@nestjs/config';
+import * as ip from 'ip';
+
 @Injectable()
 export class UploaderLocalService implements IUploaderService {
   constructor(private configService: ConfigService) {}
@@ -22,7 +24,7 @@ export class UploaderLocalService implements IUploaderService {
     await fs.unlink(pathLocal);
 
     return {
-      link: `http://localhost:${port}/public/${fileName}`,
+      link: `http://${ip.address()}:${port}/public/${fileName}`,
       pathRemote: join(destinationFolder, fileName),
     };
   }
