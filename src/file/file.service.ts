@@ -44,6 +44,7 @@ export class FileService {
         fileType: fileExtension,
       });
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         'Hemos tenido problemas procesando su peticion',
         500,
