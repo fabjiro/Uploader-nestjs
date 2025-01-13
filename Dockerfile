@@ -5,10 +5,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copia los archivos necesarios para instalar las dependencias
-COPY package.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Instala pnpm globalmente y luego las dependencias del proyecto
-RUN npm install -g pnpm && pnpm install --prod
+RUN npm install -g pnpm@8.15.8 && pnpm install
 
 # Copia el resto del código fuente
 COPY . .
@@ -28,7 +28,7 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
 # Instala únicamente las dependencias de producción
-RUN npm install -g pnpm && pnpm install --prod
+RUN npm install -g pnpm@8.15.8 && pnpm install --prod
 
 # Expone el puerto de la aplicación
 EXPOSE 3000
