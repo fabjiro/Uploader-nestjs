@@ -12,6 +12,8 @@ import { AuthController } from './auth/auth.controller';
 import { UploaderModule } from './uploader/uploader.module';
 import { DropboxService } from './dropbox/dropbox.service';
 import { WaterfreeModule } from './waterfree/waterfree.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -25,6 +27,10 @@ import { WaterfreeModule } from './waterfree/waterfree.module';
       entities: ['./dist/**/*.entity{.ts,.js}'],
       synchronize: false,
       logging: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'), // Ruta de la carpeta a exponer
+      serveRoot: '/files', // Prefijo opcional para la URL
     }),
     UserModule,
     FileModule,
