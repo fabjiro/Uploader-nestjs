@@ -34,6 +34,7 @@ EXPOSE 3000
 
 # Configura las variables de entorno
 ENV NODE_ENV=production
+ENV MODE=REMOTE
 
 # Ejecuta la aplicación con Bun
 CMD ["bun", "dist/main.js"]

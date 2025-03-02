@@ -12,6 +12,10 @@ import { UploaderLocalService } from '../uploader/uploader.local.service';
 import { IUploader } from '../uploader/interfaces/IUploader';
 import { ConfigService } from '@nestjs/config';
 import { ModeEnum } from '../enum/mode.enum';
+import * as path from 'path';
+import * as os from 'os';
+import * as fs from 'fs';
+
 @Injectable()
 export class FileService {
   constructor(
@@ -27,7 +31,7 @@ export class FileService {
     try {
       const mode = this.configService.get<string>('MODE');
       const { file } = fileData;
-      const fileName = uuidv4();
+      let fileName = uuidv4();
       const project = await this.projectService.findOne(projectId);
 
       if (!project) {
@@ -39,18 +43,20 @@ export class FileService {
 
       let fileUploader: IUploader;
 
-      console.log('mode', mode);
+      const pathRemote = `${ConstVar.pathUploader}/${project.userId}/${project.id}`;
+      fileName = `${fileName}.${fileExtension}`;
+
       if (mode === ModeEnum.REMOTE) {
         fileUploader = await this.uploaderService.Uploader(
           fileLocal,
-          `${ConstVar.pathUploader}/${project.userId}/${project.id}`,
-          `${fileName}.${fileExtension}`,
+          pathRemote,
+          fileName,
         );
       } else if (mode === ModeEnum.LOCAL) {
         fileUploader = await this.uploaderLocalService.Uploader(
           fileLocal,
-          `${ConstVar.pathUploader}/${project.userId}/${project.id}`,
-          `${fileName}.${fileExtension}`,
+          pathRemote,
+          fileName,
         );
       }
 
@@ -63,6 +69,47 @@ export class FileService {
       });
     } catch (error) {
       console.log(error);
+      throw new HttpException(
+        'Hemos tenido problemas procesando su peticion',
+        500,
+      );
+    }
+  }
+
+  async createByForm(projectId: string, file: Express.Multer.File) {
+    try {
+      const project = await this.projectService.findOne(projectId);
+
+      if (!project) {
+        throw new HttpException('Projecto no disponible', 404);
+      }
+      const tempDir = os.tmpdir();
+      const fileId = uuidv4();
+      const fileExtension = path.extname(file.originalname);
+
+      const fileLocal = `${tempDir}/${fileId}${fileExtension}`;
+      const pathRemote = `${ConstVar.pathUploader}/${project.userId}/${project.id}`;
+
+      fs.writeFileSync(fileLocal, file.buffer);
+
+      const fileName = `${fileId}.${fileExtension}`;
+
+      const fileUploader = await this.uploaderService.Uploader(
+        fileLocal,
+        pathRemote,
+        fileName,
+      );
+
+      fs.unlinkSync(fileLocal);
+
+      return await this.fileRepository.save({
+        id: fileId,
+        projectId: project.id,
+        link: fileUploader.link,
+        pathRemote: fileUploader.pathRemote,
+        fileType: fileExtension,
+      });
+    } catch (error) {
       throw new HttpException(
         'Hemos tenido problemas procesando su peticion',
         500,
