@@ -150,6 +150,18 @@ export class FileService {
     }
   }
 
+  async findAllByProject(projectId: string) {
+    try {
+      return await this.fileRepository.find({
+        where: {
+          projectId,
+        },
+      });
+    } catch (error) {
+      throw new HttpException('Hay problemas al procesar su peticion', 500);
+    }
+  }
+
   async removeByUserAndProject(
     projectId: string,
     userId: string,

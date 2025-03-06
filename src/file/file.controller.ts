@@ -64,6 +64,12 @@ export class FileController {
     return this.fileService.findAllByUser(projectId, userId);
   }
 
+  @Get(':project')
+  @UseGuards(JwtAuthGuard)
+  async getFileByProject(@Param('project') projectId: string) {
+    return this.fileService.findAllByProject(projectId);
+  }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async deleteFileByUserAndProkect(@Req() req: any, @Param('id') id: string) {
