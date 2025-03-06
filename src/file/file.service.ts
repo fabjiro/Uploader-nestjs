@@ -31,7 +31,7 @@ export class FileService {
     try {
       const mode = this.configService.get<string>('MODE');
       const { file } = fileData;
-      let fileName = uuidv4();
+      const fileId = uuidv4();
       const project = await this.projectService.findOne(projectId);
 
       if (!project) {
@@ -44,7 +44,7 @@ export class FileService {
       let fileUploader: IUploader;
 
       const pathRemote = `${ConstVar.pathUploader}/${project.userId}/${project.id}`;
-      fileName = `${fileName}.${fileExtension}`;
+      const fileName = `${fileId}.${fileExtension}`;
 
       if (mode === ModeEnum.REMOTE) {
         fileUploader = await this.uploaderService.Uploader(
@@ -61,7 +61,7 @@ export class FileService {
       }
 
       return await this.fileRepository.save({
-        id: fileName,
+        id: fileId,
         projectId: project.id,
         link: fileUploader.link,
         pathRemote: fileUploader.pathRemote,
