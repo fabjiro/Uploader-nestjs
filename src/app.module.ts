@@ -23,10 +23,12 @@ import { join } from 'path';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: process.env.POSTGRES_URL + '?sslmode=require', // or process.env.POSTGRES_URL_NON_POOLING for non-pooling connection
+      url: process.env.POSTGRES_URL + '?sslmode=disable', // or process.env.POSTGRES_URL_NON_POOLING for non-pooling connection
       entities: ['./dist/**/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
       logging: true,
+      ssl: false,
+      
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'public'), // Ruta de la carpeta a exponer
